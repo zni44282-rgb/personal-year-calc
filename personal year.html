@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Year Calculator Pro - အကျယ်ချဲ့ထားသောဗားရှင်း</title>
+    <style>
+        /* အခြေခံစတိုင်များ */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Pyidaungsu', 'Noto Sans Myanmar', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            background-image: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            color: #333;
+            line-height: 1.7;
+            padding: 5px;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* ဘယ်ဘက်ကဏ္ဍ - တွက်စက် */
+        .calculator-section {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* ညာဘက်ကဏ္ဍ - အဓိပ္ပာယ်ဖွင့်ဆိုချက်များ */
+        .interpretation-section {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+            max-height: 95vh;
+        }
+        
+        /* ခေါင်းစဉ်များ */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        
+        h2 {
+            color: #2980b9;
+            margin: 25px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+            font-size: 1.6rem;
+        }
+        
+        h3 {
+            color: #27ae60;
+            margin: 20px 0 10px 0;
+            font-size: 1.3rem;
+        }
+        
+        /* နည်းနာရှင်းလင်းချက် */
+        .methodology-box {
+            background-color: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .methodology-box h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        /* ထည့်သွင်းရန်နေရာများ */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .input-column {
+            flex: 1;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #5d6d7e;
+            font-size: 15px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background-color: #f8f9fa;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        /* တွက်ချက်ရန်ခလုတ် */
+        .calculate-btn {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+        
+        .calculate-btn:hover {
+            background: linear-gradient(to right, #219150, #27ae60);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
+        }
+        
+        /* ရလဒ်ပြသနေရာ */
+        #result {
+            background: linear-gradient(to bottom right, #f0f8ff, #e8f4fc);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 2px solid #3498db;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .year-number-display {
+            font-size: 48px;
+            font-weight: 900;
+            color: #d35400;
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .year-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2980b9;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .meaning-text {
+            line-height: 1.8;
+            color: #2c3e50;
+            font-size: 16px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+        }
+        
+        /* အနှစ်ချုပ်အချက်များ */
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .summary-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #3498db;
+        }
+        
+        .summary-item h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        /* အဓိပ္ပာယ်ဖွင့်ဆိုချက်ကဏ္ဍ */
+        .meaning-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 5px solid;
+            transition: transform 0.3s;
+        }
+        
+        .meaning-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .meaning-item h4 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .meaning-item p {
+            color: #5d6d7e;
+            margin-bottom: 10px;
+        }
+        
+        .meaning-item ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .meaning-item li {
+            margin-bottom: 8px;
+        }
+        
+        /* အရောင်အမျိုးမျိုး */
+        .year-1 { border-left-color: #e74c3c; }
+        .year-2 { border-left-color: #3498db; }
+        .year-3 { border-left-color: #f39c12; }
+        .year-4 { border-left-color: #27ae60; }
+        .year-5 { border-left-color: #9b59b6; }
+        .year-6 { border-left-color: #1abc9c; }
+        .year-7 { border-left-color: #34495e; }
+        .year-8 { border-left-color: #d35400; }
+        .year-9 { border-left-color: #2c3e50; }
+        
+        /* တက်ဘ်များ */
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* အောက်ခြေမှတ်ချက် */
+        .footer-note {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        /* ဂဏန်းတွက်နည်း */
+        .calculation-steps {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 1px dashed #3498db;
+        }
+        
+        .step {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .step:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    
+    
+    <div class="main-container">
+        <!-- ဘယ်ဘက်ကဏ္ဍ - တွက်စက် -->
+        <div class="calculator-section">
+            <h2>သင့်ကံကြမ္မာနှစ် တွက်ချက်ရန်</h2>
+            
+            <div class="input-group">
+                <div class="input-row">
+                    <div class="input-column">
+                        <label>မွေးလ</label>
+                        <select id="month">
+                            <option value="1">ဇန်နဝါရီ (1)</option>
+                            <option value="2">ဖေဖော်ဝါရီ (2)</option>
+                            <option value="3">မတ် (3)</option>
+                            <option value="4">ဧပြီ (4)</option>
+                            <option value="5">မေ (5)</option>
+                            <option value="6">ဇွန် (6)</option>
+                            <option value="7">ဇူလိုင် (7)</option>
+                            <option value="8">သြဂုတ် (8)</option>
+                            <option value="9">စက်တင်ဘာ (9)</option>
+                            <option value="10">အောက်တိုဘာ (10)</option>
+                            <option value="11">နိုဝင်ဘာ (11)</option>
+                            <option value="12">ဒီဇင်ဘာ (12)</option>
+                        </select>
+                    </div>
+                    <div class="input-column">
+                        <label>မွေးရက်</label>
+                        <input type="number" id="day" placeholder="ဥပမာ: 15" min="1" max="31">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>တွက်ချက်လိုသည့် ခုနှစ်</label>
+                    <input type="number" id="currentYear" value="2026" min="1900" max="2100">
+                </div>
+            </div>
+            
+            <button class="calculate-btn" onclick="calculatePersonalYear()">ကံကြမ္မာနှစ် တွက်ချက်မည်</button>
+            
+            <div class="calculation-steps">
+                <h4>တွက်ချက်နည်း အဆင့်ဆင့်</h4>
+                <div class="step">မွေးလ + မွေးရက် + ရွေးချယ်ထားသောနှစ် ပေါင်းပါ</div>
+                <div class="step">ရလဒ်ကို ဂဏန်းတစ်လုံးတည်း ဖြစ်သည်အထိ ဆက်လက်ပေါင်းပါ</div>
+                <div class="step">ရရှိသော ဂဏန်းသည် သင့် Personal Year ဖြစ်သည်</div>
+            </div>
+            
+            <div id="result">
+                <div class="year-number-display" id="yearNumberDisplay"></div>
+                <div class="year-title" id="yearTitleDisplay"></div>
+                <div class="meaning-text" id="meaningText"></div>
+                
+                <div class="summary-box">
+                    <div class="summary-item">
+                        <h4>အဓိကအချက်</h4>
+                        <div id="keyFocus"></div>
+                    </div>
+                    <div class="summary-item">
+                        <h4>အကောင်းဆုံးလုပ်ဆောင်ချက်</h4>
+                        <div id="bestActions"></div>
+                    </div>
+                    <div class="summary-item">
+                        <h4>ရှောင်ရန်အချက်များ</h4>
+                        <div id="avoidActions"></div>
+                    </div>
+                    <div class="summary-item">
+                        <h4>ကံကောင်းသည့်နေရာ</h4>
+                        <div id="luckyAreas"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+     
+            
+           
+        </div>
+    </div>
+    
+    
+
+    <script>
+        // တပ်ဘ်များပြောင်းလဲခြင်း
+        function showTab(tabNumber) {
+            // လက်ရှိတက်ဘ်များကို ဖယ်ရှား
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // ရွေးချယ်ထားသော တပ်ဘ်ကို ပြသခြင်း
+            document.querySelectorAll('.tab')[tabNumber-1].classList.add('active');
+            document.getElementById('tab' + tabNumber).classList.add('active');
+        }
+        
+        // ဂဏန်းတစ်လုံးတည်းသို့ လျှော့ချပေးသော လုပ်ဆောင်ချက်
+        function reduceToSingleDigit(num) {
+            if (num === 0) return 0;
+            
+            let digitSum = 0;
+            let numStr = num.toString();
+            
+            for(let i = 0; i < numStr.length; i++) {
+                digitSum += parseInt(numStr[i]);
+            }
+            
+            if (digitSum > 9) {
+                return reduceToSingleDigit(digitSum);
+            } else {
+                return digitSum;
+            }
+        }
+        
+        // Personal Year တွက်ချက်သော လုပ်ဆောင်ချက်
+        function calculatePersonalYear() {
+            // ထည့်သွင်းသော အချက်အလက်များကို ဖတ်ပါ
+            const month = parseInt(document.getElementById('month').value);
+            const day = parseInt(document.getElementById('day').value);
+            const currentYear = parseInt(document.getElementById('currentYear').value);
+            
+            // အချက်အလက်များ မှန်ကန်မှုကို စစ်ဆေးပါ
+            if (!day || day < 1 || day > 31) {
+                alert("မှန်ကန်သော မွေးရက်ကို ထည့်သွင်းပါ (1 မှ 31 အထိ)");
+                return;
+            }
+            
+            if (!currentYear || currentYear < 1900 || currentYear > 2100) {
+                alert("မှန်ကန်သော ခုနှစ်ကို ထည့်သွင်းပါ (1900 မှ 2100 အထိ)");
+                return;
+            }
+            
+            // Personal Year တွက်ချက်ခြင်း
+            let monthSum = reduceToSingleDigit(month);
+            let daySum = reduceToSingleDigit(day);
+            let yearSum = reduceToSingleDigit(currentYear);
+            
+            let personalYearNumber = reduceToSingleDigit(monthSum + daySum + yearSum);
+            
+            // Personal Year အဓိပ္ပာယ်ဖွင့်ဆိုချက်များ
+            const personalYearData = {
+                1: {
+                    title: "အစပြုခြင်းနှစ်",
+                    meaning: "ဤနှစ်သည် သင့်ဘဝတွင် အသစ်အဆန်းများ စတင်ရန် အကောင်းဆုံးအချိန်ဖြစ်သည်။ ရဲရင့်စွာ ဆုံးဖြတ်ချက်ချပြီး ကိုယ်ပိုင်လမ်းကြောင်းသစ်ကို စတင်ပါ။ ဤနှစ်တွင် သင်၏ ကိုယ်ပိုင်အရည်အချင်းများကို ဖော်ထုတ်ရန် လိုအပ်ပါသည်။",
+                    keyFocus: "ကိုယ်ပိုင်အုပ်ချုပ်ခွင့်၊ အသစ်စတင်ခြင်း၊ ရည်မှန်းချက်သစ်များ",
+                    bestActions: "စီးပွားရေးစတင်ခြင်း၊ ပညာရေးအသစ်၊ ကိုယ်ပိုင်စီမံကိန်းများ",
+                    avoidActions: "အလွန်အမင်းစောင့်ဆိုင်းခြင်း၊ အခြားသူများအပေါ် အလွန်အမင်းမှီခိုခြင်း",
+                    luckyAreas: "စီးပွားရေး၊ နည်းပညာ၊ စတင်ခြင်း"
+                },
+                2: {
+                    title: "စည်းလုံးညီညွတ်ရေးနှစ်",
+                    meaning: "ဤနှစ်သည် ဆက်ဆံရေးကောင်းမွန်ရေးအတွက် အဓိကကျသည်။ စိတ်ရှည်သည်းခံမှုနှင့် နားလည်မှုဖြင့် ဆက်ဆံပါ။ ဤနှစ်တွင် အခြားသူများနှင့် ပူးပေါင်းဆောင်ရွက်ခြင်းဖြင့် အောင်မြင်မှုရနိုင်သည်။",
+                    keyFocus: "ပူးပေါင်းဆောင်ရွက်ခြင်း၊ နားလည်မှု၊ ဆက်ဆံရေး",
+                    bestActions: "မိတ်ဖက်ရှာခြင်း၊ ညှိနှိုင်းဆွေးနွေးခြင်း၊ ဆက်ဆံရေးပြုပြင်ခြင်း",
+                    avoidActions: "အလျင်စလိုလုပ်ခြင်း၊ ပဋိပက္ခတိုးမြှင့်ခြင်း၊ တစ်ကိုယ်ကောင်းဆန်ခြင်း",
+                    luckyAreas: "အချစ်ရေး၊ မိတ်ဆွေရေး၊ ပူးပေါင်းဆောင်ရွက်မှု"
+                },
+                3: {
+                    title: "ဖန်တီးမှုနှစ်",
+                    meaning: "ဤနှစ်တွင် သင်၏ဖန်တီးနိုင်စွမ်းကို အပြည့်အဝအသုံးချပါ။ လူမှုရေးဆက်ဆံရေးကို တိုးချဲ့ပြီး ပျော်ရွှင်မှုကို ရှာဖွေပါ။ အနုပညာနှင့် ဖန်တီးမှုဆိုင်ရာ လှုပ်ရှားမှုများတွင် ပါဝင်ပါ။",
+                    keyFocus: "ဖန်တီးမှု၊ ဖော်ပြခြင်း၊ လူမှုရေး",
+                    bestActions: "အနုပညာလက်ရာများဖန်တီးခြင်း၊ လူမှုရေးပွဲများတက်ခြင်း၊ ခရီးသွားခြင်း",
+                    avoidActions: "ပိတ်မိနေခြင်း၊ လူမှုရေးရှောင်ကြဉ်ခြင်း၊ စိတ်ညစ်ခြင်း",
+                    luckyAreas: "အနုပညာ၊ ဖျော်ဖြေရေး၊ လူမှုရေး"
+                },
+                4: {
+                    title: "တည်ဆောက်မှုနှစ်",
+                    meaning: "ဤနှစ်သည် အလုပ်ကြိုးစားရမည့်နှစ်ဖြစ်သည်။ ခိုင်မာသောအခြေခံများ တည်ဆောက်ပါ။ စည်းကမ်းနှင့် စနစ်တကျ လုပ်ဆောင်ခြင်းဖြင့် အောင်မြင်မှုရရှိမည်။",
+                    keyFocus: "တည်ဆောက်ခြင်း၊ စည်းကမ်း၊ ခိုင်မာသော အခြေခံ",
+                    bestActions: "အိမ်/အလုပ်တည်ဆောက်ခြင်း၊ ဘဏ္ဍာရေးစီမံခြင်း၊ စနစ်တကျအလုပ်လုပ်ခြင်း",
+                    avoidActions: "အလုပ်ပျက်ခြင်း၊ စည်းကမ်းမဲ့ခြင်း၊ ခေါင်းပါးခြင်း",
+                    luckyAreas: "အဆောက်အဦ၊ ဘဏ္ဍာရေး၊ စီမံခန့်ခွဲမှု"
+                },
+                5: {
+                    title: "လွတ်လပ်ပြောင်းလဲမှုနှစ်",
+                    meaning: "ဤနှစ်တွင် ပြောင်းလဲမှုများကို ကြိုဆိုပါ။ လွတ်လပ်မှုကို ခံစားပြီး စွန့်စားမှုအသစ်များ ပြုလုပ်ပါ။ ခရီးသွားလာခြင်းနှင့် အသစ်အဆန်းများ ရှာဖွေပါ။",
+                    keyFocus: "လွတ်လပ်မှု၊ ပြောင်းလဲမှု၊ စွန့်စားခြင်း",
+                    bestActions: "ခရီးထွက်ခြင်း၊ ပညာရေးအသစ်၊ စီးပွားရေးအသစ်",
+                    avoidActions: "ပုံသေအတွေးအခေါ်၊ ပြောင်းလဲမှုကြောက်ခြင်း၊ ရေရှည်ကတိပေးခြင်း",
+                    luckyAreas: "ခရီးသွားလာရေး၊ ဆက်သွယ်ရေး၊ လွတ်လပ်မှု"
+                },
+                6: {
+                    title: "တာဝန်ယူမှုနှစ်",
+                    meaning: "ဤနှစ်တွင် မိသားစုနှင့် အိမ်ထောင်ရေးကိစ္စများကို ဦးစားပေးပါ။ တာဝန်ယူမှုရှိပြီး အခြားသူများအတွက် ဂရုစိုက်ပါ။ အိမ်တွင်းပြင်ဆင်မှုများ ပြုလုပ်ပါ။",
+                    keyFocus: "တာဝန်ယူမှု၊ မိသားစု၊ ဂရုစိုက်မှု",
+                    bestActions: "အိမ်ထောင်ပြုခြင်း၊ မိသားစုအချိန်ပေးခြင်း၊ အိမ်ပြင်ဆင်ခြင်း",
+                    avoidActions: "တာဝန်ရှောင်ခြင်း၊ မိသားစုကို လျစ်လျူရှုခြင်း၊ ကိုယ်ကျိုးရှာခြင်း",
+                    luckyAreas: "မိသားစု၊ အိမ်ထောင်၊ အိမ်ရာ"
+                },
+                7: {
+                    title: "သုတေသနနှင့် ပြန်လည်သုံးသပ်မှုနှစ်",
+                    meaning: "ဤနှစ်သည် အတွင်းစိတ်ကို သုတေသနပြုရန် အချိန်ဖြစ်သည်။ တစ်ကိုယ်တည်း အချိန်ဖြုန်းပြီး ဝိညာဉ်ရေးရာ ဖွံ့ဖြိုးအောင် ကြိုးစားပါ။ သင်ယူမှုနှင့် သုတေသနပြုပါ။",
+                    keyFocus: "သုတေသန၊ ဝိညာဉ်ရေး၊ တစ်ကိုယ်တည်း",
+                    bestActions: "တရားထိုင်ခြင်း၊ သုတေသနပြုခြင်း၊ နှစ်ခြိုက်စွာအနားယူခြင်း",
+                    avoidActions: "လူထုထဲအလွန်အမင်းနေခြင်း၊ အတွေးအခေါ်ကင်းမဲ့ခြင်း၊ မတည်ငြိမ်ခြင်း",
+                    luckyAreas: "ပညာရေး၊ ဝိညာဉ်ရေး၊ သုတေသန"
+                },
+                8: {
+                    title: "အောင်မြင်မှုနှင့် ရလဒ်နှစ်",
+                    meaning: "ဤနှစ်တွင် ကြိုးစားအားထုတ်မှု၏ အကျိုးဆက်များကို ခံစားရမည်။ ငွေကြေးအောင်မြင်မှုရရှိရန် အကောင်းဆုံးအချိန်ဖြစ်သည်။ အာဏာနှင့် အသိအမှတ်ပြုခံရမည်။",
+                    keyFocus: "အောင်မြင်မှု၊ ငွေကြေး၊ အာဏာ",
+                    bestActions: "ရင်းနှီးမြုပ်နှံခြင်း၊ ရာထူးတိုးခြင်း၊ စီးပွားရေးချဲ့ထွင်ခြင်း",
+                    avoidActions: "ငွေကြေးအလွန်အမင်းသုံးခြင်း၊ အန္တရာယ်များသောရင်းနှီးမြုပ်နှံမှု၊ မောက်မာခြင်း",
+                    luckyAreas: "စီးပွားရေး၊ ရင်းနှီးမြုပ်နှံမှု၊ အာဏာ"
+                },
+                9: {
+                    title: "အဆုံးသတ်နှင့် လွှတ်ချမှုနှစ်",
+                    meaning: "ဤနှစ်သည် အဟောင်းများကို စွန့်လွှတ်ရန် အချိန်ဖြစ်သည်။ မလိုအပ်တော့သော အရာများကို ဖယ်ရှားပြီး စီမံကိန်းများကို အဆုံးသတ်ပါ။ လှူဒါန်းခြင်းနှင့် စေတနာ့ဝန်ထမ်းလုပ်ငန်းများ ပြုလုပ်ပါ။",
+                    keyFocus: "အဆုံးသတ်ခြင်း၊ လွှတ်ချခြင်း၊ ကရုဏာ",
+                    bestActions: "အကြွေးဆပ်ခြင်း၊ ရှင်းလင်းရေးလုပ်ခြင်း၊ လှူဒါန်းခြင်း",
+                    avoidActions: "အသစ်စတင်ခြင်း၊ အကောင်းမြင်လွန်းခြင်း၊ လက်မလွှတ်နိုင်ခြင်း",
+                    luckyAreas: "လှူဒါန်းမှု၊ ရှင်းလင်းရေး၊ အဆုံးသတ်ခြင်း"
+                }
+            };
+            
+            // ရလဒ်ကို ပြသခြင်း
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            
+            const yearData = personalYearData[personalYearNumber];
+            
+            // Personal Year နံပါတ်ကို ပြသခြင်း
+            document.getElementById('yearNumberDisplay').innerText = "Personal Year " + personalYearNumber;
+            document.getElementById('yearTitleDisplay').innerText = yearData.title;
+            document.getElementById('meaningText').innerHTML = yearData.meaning;
+            
+            // အနှစ်ချုပ်အချက်များကို ပြသခြင်း
+            document.getElementById('keyFocus').innerText = yearData.keyFocus;
+            document.getElementById('bestActions').innerText = yearData.bestActions;
+            document.getElementById('avoidActions').innerText = yearData.avoidActions;
+            document.getElementById('luckyAreas').innerText = yearData.luckyAreas;
+            
+            // ညာဘက်ကဏ္ဍရှိ သက်ဆိုင်ရာ Year အပိုင်းသို့ ခုန်ခြင်း
+            const yearElement = document.querySelector('.year-' + personalYearNumber);
+            if (yearElement) {
+                yearElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // အရောင်အသွေးပြောင်းလဲခြင်း (ရွေးချယ်ထားကြောင်း ပြသခြင်း)
+                document.querySelectorAll('.meaning-item').forEach(item => {
+                    item.style.transform = 'scale(1)';
+                    item.style.boxShadow = 'none';
+                });
+                
+                yearElement.style.transform = 'scale(1.02)';
+                yearElement.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
+            }
+            
+            // ရလဒ်ကို ညှိနှိုင်းပြသရန်
+            window.scrollTo({
+                top: resultDiv.offsetTop - 50,
+                behavior: 'smooth'
+            });
+        }
+        
+        // စာမျက်နှာ စတင်တက်လာပါက လက်ရှိနှစ်ကို အလိုအလျောက်ထည့်ပေးခြင်း
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentYear = new Date().getFullYear();
+            document.getElementById('currentYear').value = currentYear;
+            
+            // ဒီဖောင့်ကို စမ်းကြည့်ပါ
+            console.log("Personal Year Calculator Pro - Extended Version Loaded");
+        });
+    </script>
+</body>
+</html>
